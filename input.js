@@ -15,6 +15,7 @@ export default class InputHandler {
           break;
         case 38:
           this.inputStates["up"] = true;
+          game.currentWork.knitStitch();
           break;
         case 39:
           this.inputStates["right"] = true;
@@ -24,15 +25,14 @@ export default class InputHandler {
           break;
         case 27:
           this.inputStates["esc"] = true;
-          console.log("escape!")
           game.togglePause();
           break;
         case 32:
           this.inputStates["space"] = true;
           break;
-        case 17:
+        case 16:
           this.inputStates["shift"] = true;
-
+          game.currentWork.advanceStitch();
           break;
       }
     });
