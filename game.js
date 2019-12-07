@@ -1,4 +1,6 @@
 import InputHandler from "./input.js"
+import {Stitch, Work} from "./stitch.js"
+import { level0 } from "./pattern.js"
 
 const GAMESTATE = {
   PAUSED: 0,
@@ -14,6 +16,7 @@ export default class Game{
     this.gamestate = GAMESTATE.MENU;
 
     this.input = new InputHandler(this);
+    this.currentWork = new Work(0, 0, this.gameWidth, this.gameHeight, level0);
   }
   start(){
     if(this.gamestate != GAMESTATE.MENU) return;
@@ -26,10 +29,11 @@ export default class Game{
     //main game running
     ctx.fillStyle = "blue";
     ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
-    ctx.font = "36px Arial";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.fillText("Game Running", this.gameWidth/2, this.gameHeight/2)
+    // ctx.font = "36px Arial";
+    // ctx.fillStyle = "white";
+    // ctx.textAlign = "center";
+    // ctx.fillText("Game Running", this.gameWidth/2, this.gameHeight/2)
+    this.currentWork.render(ctx);
 
     if(this.gamestate == GAMESTATE.PAUSED){
       ctx.fillStyle = "green";
