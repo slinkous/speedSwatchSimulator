@@ -1,13 +1,16 @@
+import {GAMESTATE} from "./game.js"
+
 export default class InputHandler {
   constructor(game){
     this.inputStates = {};
-    document.addEventListener("mousedown", event => {
-      this.inputStates.mouseDown = true;
-      game.start();
-    });
-    document.addEventListener("mouseup", event => {
-      this.inputStates.mouseDown = false;
-    });
+    // document.addEventListener("mousedown", event => {
+    //   this.inputStates.mouseDown = true;
+    //   game.start();
+    //   game.resetGame();
+    // });
+    // document.addEventListener("mouseup", event => {
+    //   this.inputStates.mouseDown = false;
+    // });
     document.addEventListener("keydown", event => {
       switch(event.keyCode){
         case 37:
@@ -15,13 +18,19 @@ export default class InputHandler {
           break;
         case 38:
           this.inputStates["up"] = true;
-          game.currentWork.knitStitch();
+
+          if(game.gamestate == GAMESTATE.RUNNING){
+            game.currentWork.knitStitch();
+          }
+
           break;
         case 39:
           this.inputStates["right"] = true;
           break;
         case 40:
           this.inputStates["down"] = true;
+          if(game.gamestate == GAMESTATE.RUNNING)
+            game.currentWork.purlStitch();
           break;
         case 27:
           this.inputStates["esc"] = true;
@@ -34,6 +43,13 @@ export default class InputHandler {
           this.inputStates["shift"] = true;
           game.currentWork.advanceStitch();
           break;
+        case 13:
+          this.inputStates["enter"] = true;
+          if(game.gamestate == GAMESTATE.MENU) game.start();
+          if(game.gamestate == GAMESTATE.NEXTLEVEL) game.levelUp();
+          if(game.gamestate == GAMESTATE.GAMEOVER) game.reset();
+          break;
+
       }
     });
     document.addEventListener("keyup", event => {
