@@ -1,4 +1,8 @@
-import {GAMESTATE} from "./game.js"
+import {GAMESTATE} from "./game.js";
+
+let keyBuffer = [];
+let knit = ["up", "left", "right", "down"]
+let purl = ["down", "left", "right","up"]
 
 export default class InputHandler {
   constructor(game){
@@ -29,8 +33,10 @@ export default class InputHandler {
           break;
         case 40:
           this.inputStates["down"] = true;
-          if(game.gamestate == GAMESTATE.RUNNING)
+          if(game.gamestate == GAMESTATE.RUNNING){
             game.currentWork.purlStitch();
+          }
+
           break;
         case 27:
           this.inputStates["esc"] = true;
@@ -48,6 +54,7 @@ export default class InputHandler {
           if(game.gamestate == GAMESTATE.MENU) game.start();
           if(game.gamestate == GAMESTATE.NEXTLEVEL) game.levelUp();
           if(game.gamestate == GAMESTATE.GAMEOVER) game.reset();
+          if(game.gamestate == GAMESTATE.RUNNING) game.currentWork.turnWork();
           break;
 
       }
