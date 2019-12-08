@@ -11,25 +11,34 @@ export class Stitch{
     this.active = false;
   }
   draw(ctx, loc, size){
+    ctx.save();
+    ctx.filter = 'hue-rotate(90deg)'
     ctx.drawImage(stitchImg, 0, this.type*this.size, this.size, this.size, loc.x, loc.y, size.w, size.h)
+    ctx.restore();
   }
   drawBackside(ctx, loc, size){
     let t = this.type == 0? 1 : 0;
+    ctx.save();
+    ctx.filter = 'hue-rotate(90deg)'
     ctx.drawImage(stitchImg, 0, t*this.size, this.size, this.size, loc.x, loc.y, size.w, size.h)
+    ctx.restore();
   }
 }
 
 export class Work{
   constructor(x, y, width, height, pattern){
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+
+
     this.stitchesPerRow = 12
     this.stitchSize = {
       w: width/12,
       h: height/12
     }
+    this.x = x;
+    this.y = y - (this.stitchSize.h*pattern.length);
+
+    this.width = width;
+    this.height = height;
     this.stitches = []
     this.parse(pattern);
     this.flipped = false;
@@ -42,15 +51,17 @@ export class Work{
   }
   parse(pattern){
     let index = 0;
+    let row = 0;
     for(var i = pattern.length-1; i>=0; i--){
       for(var j = 0; j<pattern[i].length; j++){
         let q = j;
-        if(i%2 == 0){
+        if(row%2 == 0){
           q = this.stitchesPerRow - j - 1;
         }
-        this.stitches.push(new Stitch(pattern[i][q], index, pattern.length - i -1, q))
+        this.stitches.push(new Stitch(pattern[i][q], index, i, q))
         index++
       }
+      row += 1
     }
   }
   getLocation(row, col){
@@ -60,32 +71,45 @@ export class Work{
     for(let i=0; i<this.stitches.length; i++){
         let s = this.stitches[i]
         if(!s.worked && !s.active) continue;
-        let loc =  this.getLocation(s.row, s.col)
+        let loc;
+        if(!this.flipped){
+          loc =  this.getLocation(s.row, s.col)
           s.draw(ctx, loc, this.stitchSize);
+        } else {
+          loc =  this.getLocation(s.row, this.stitchesPerRow-s.col-1)
+          s.drawBackside(ctx, loc, this.stitchSize);
+        }
+
         if(s.active){
           ctx.fillStyle = "rgba(255, 255, 255, 0.5)"
           ctx.fillRect(loc.x, loc.y, this.stitchSize.w, this.stitchSize.h)
         }
+
+
     }
   }
   setActiveStitch(){
+
     this.workingStitch = this.stitches[this.currentStitch]
     this.workingStitch.active = true;
+    console.log(this.workingStitch.col)
   }
   knitStitch(){
-    if(this.atEndOfRow)return;
+    // if(this.atEndOfRow)return;
     let s = this.workingStitch;
     if(s.worked) return;
-    if(s.type == 0){
+    if((s.type == 0 && !this.flipped)
+    ||(s.type == 1 && this.flipped)){
       s.worked = true;
       s.active = false;
     }
   }
   purlStitch(){
-    if(this.atEndOfRow)return;
+    // if(this.atEndOfRow)return;
     let s = this.workingStitch;
     if(s.worked) return;
-    if(s.type == 1){
+    if((s.type == 1 && !this.flipped)
+    ||(s.type == 0 && this.flipped)){
       s.worked = true;
       s.active = false;
     }
@@ -99,16 +123,35 @@ export class Work{
         this.currentStitch++
         this.setActiveStitch()
       } else {
-        this.finished = true;
+        // this.finished = true;
       }
-
-      if(this.currentStitch + 1 % this.stitchesPerRow == 0){
+      if((this.currentStitch + 1) % this.stitchesPerRow == 0){
           this.atEndOfRow = true;
       }
   }
   turnWork(){
+    if(!this.atEndOfRow || ! this.workingStitch.worked) return;
     this.flipped = !this.flipped;
     this.currentRow++;
     this.atEndOfRow = false
+    this.y += this.stitchSize.h
+    this.advanceStitch();
+  }
+  uiHint(){
+    // console.log(this.workingStitch.type)
+    if(this.finished) return;
+    if(this.workingStitch.worked && !this.atEndOfRow){
+      return "[shift] to start next stitch.";
+    }
+    if(this.atEndOfRow){
+      return "[enter] to turn work for new row.";
+    }
+    if((this.workingStitch.type == 0 && !this.flipped) || (this.flipped && this.workingStitch.type == 1)){
+      return "[up] to knit stitch";
+    }
+    if((this.workingStitch.type == 1 && !this.flipped)|| (this.flipped && this.workingStitch.type == 0)){
+      return "[down] to purl stitch";
+    }
+    return "Not sure what to do here";
   }
 }

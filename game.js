@@ -1,6 +1,6 @@
 import InputHandler from "./input.js"
 import {Stitch, Work} from "./stitch.js"
-import { level0, level1, level2 } from "./pattern.js"
+import { level0, level1, level2, level3, level4 }  from "./pattern.js"
 
 export const GAMESTATE = {
   PAUSED: 0,
@@ -9,7 +9,7 @@ export const GAMESTATE = {
   GAMEOVER: 3,
   NEXTLEVEL:4
 }
-const levels = [level0, level1, level2]
+const levels = [level0, level1, level2, level3, level4]
 
 export class Game{
   constructor(gameWidth, gameHeight){
@@ -21,6 +21,7 @@ export class Game{
     this.input = new InputHandler(this);
     this.currentWork = new Work(this.gameWidth*0.1, this.gameHeight/2, this.gameWidth*0.8, this.gameHeight*0.8, this.level.pattern);
     this.gameTime = 0;
+    this.hint;
   }
   start(){
     if(this.gamestate != GAMESTATE.MENU && this.gamestate != GAMESTATE.NEXTLEVEL ) return;
@@ -33,31 +34,45 @@ export class Game{
       console.log("Work Finished!")
       this.gamestate = GAMESTATE.NEXTLEVEL
     }
+    this.hint = this.currentWork.uiHint()
   }
   draw(ctx){
     //main game running
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
     ctx.font = "64px Solway, serif";
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = "#00a2e8";
     ctx.textAlign = "center";
     ctx.fillText(this.level.title, this.gameWidth/2, this.gameHeight/8)
     ctx.font = "36px Solway, serif";
     ctx.fillText(this.level.description, this.gameWidth/2, this.gameHeight/4)
     this.currentWork.render(ctx);
 
-    ctx.fillStyle = "black"
-    ctx.fillRect(0, 0, 100, 100, 5);
-    ctx.font = "48px Tomorrow, serif";
-    ctx.fillStyle = "red";
-    // ctx.textAlign = "left";
-    ctx.fillText(Math.floor(this.gameTime/1000), 50, 60)
+    //hud
+    ctx.fillStyle = "#00a2e8";
+    ctx.font = "36px Solway, serif";
+    ctx.fillText(this.hint, this.gameWidth/2, this.gameHeight - 40)
+
+    ctx.font = "16px Solway, serif";
+    if(!this.currentWork.flipped){
+      ctx.fillText("front side", this.gameWidth/2 + 32, this.gameHeight/2 - 48)
+    } else {
+      ctx.fillText("back side", this.gameWidth/2 + 32, this.gameHeight/2 - 48)
+    }
+
+    // Clock
+    // ctx.fillStyle = "black"
+    // ctx.fillRect(0, 0, 100, 100, 5);
+    // ctx.font = "48px Tomorrow, serif";
+    // ctx.fillStyle = "red";
+    // // ctx.textAlign = "left";
+    // ctx.fillText(Math.floor(this.gameTime/1000), 50, 60)
 
     if(this.gamestate == GAMESTATE.PAUSED){
-      ctx.fillStyle = "green";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.5)"
       ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
       ctx.font = "36px Solway, serif";
-      ctx.fillStyle = "white";
+      ctx.fillStyle = "gray";
       ctx.textAlign = "center";
       ctx.fillText("Game Paused", this.gameWidth/2, this.gameHeight/2)
     }
