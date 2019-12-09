@@ -1,15 +1,5 @@
 const stitchImg = document.querySelector("#stitchImg");
 
-export const COLORSHIFT = {
-  BLUE: 0,
-  PURPLE: 45,
-  RED: 135,
-  ORANGE: 180,
-  YELLOW: 215,
-  GREEN: 270,
-
-}
-
 export class Stitch{
   constructor(type, index, row, col, color){
     this.type = type;
@@ -37,7 +27,7 @@ export class Stitch{
 }
 
 export class Work{
-  constructor(x, y, width, height, pattern, color=COLORSHIFT.BLUE){
+  constructor(x, y, width, height, pattern, color=0){
     this.stitchesPerRow = 12
     this.stitchSize = {
       w: width/12,

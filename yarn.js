@@ -1,4 +1,12 @@
-import {COLORSHIFT} from "/stitch.js";
+export const COLORSHIFT = {
+  BLUE: 0,
+  PURPLE: 45,
+  RED: 135,
+  ORANGE: 180,
+  YELLOW: 215,
+  GREEN: 270,
+
+}
 
 const yarnImg = document.querySelector("#yarnBall");
 

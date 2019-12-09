@@ -20,7 +20,7 @@ export class Game{
     this.gameWidth = gameWidth;
     this.gameHeight = gameHeight;
     this.gamestate = GAMESTATE.MENU;
-    this.levelNumber = 4;
+    this.levelNumber = 0;
     this.level = levels[this.levelNumber];
     this.input = new InputHandler(this);
 
