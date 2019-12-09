@@ -1,7 +1,17 @@
 const stitchImg = document.querySelector("#stitchImg");
 
+export const COLORSHIFT = {
+  BLUE: 0,
+  PURPLE: 45,
+  RED: 135,
+  ORANGE: 180,
+  YELLOW: 215,
+  GREEN: 270,
+
+}
+
 export class Stitch{
-  constructor(type, index, row, col){
+  constructor(type, index, row, col, color){
     this.type = type;
     this.row = row;
     this.col = col;
@@ -9,26 +19,25 @@ export class Stitch{
     this.stichesPerRow = 12;
     this.worked = false;
     this.active = false;
+    this.color = color;
   }
   draw(ctx, loc, size){
     ctx.save();
-    ctx.filter = 'hue-rotate(90deg)'
+    ctx.filter = `hue-rotate(${this.color}deg)`
     ctx.drawImage(stitchImg, 0, this.type*this.size, this.size, this.size, loc.x, loc.y, size.w, size.h)
     ctx.restore();
   }
   drawBackside(ctx, loc, size){
     let t = this.type == 0? 1 : 0;
     ctx.save();
-    ctx.filter = 'hue-rotate(90deg)'
+    ctx.filter = `hue-rotate(${this.color}deg)`
     ctx.drawImage(stitchImg, 0, t*this.size, this.size, this.size, loc.x, loc.y, size.w, size.h)
     ctx.restore();
   }
 }
 
 export class Work{
-  constructor(x, y, width, height, pattern){
-
-
+  constructor(x, y, width, height, pattern, color=COLORSHIFT.BLUE){
     this.stitchesPerRow = 12
     this.stitchSize = {
       w: width/12,
@@ -39,6 +48,7 @@ export class Work{
 
     this.width = width;
     this.height = height;
+    this.color = color
     this.stitches = []
     this.parse(pattern);
     this.flipped = false;
@@ -58,7 +68,7 @@ export class Work{
         if(row%2 == 0){
           q = this.stitchesPerRow - j - 1;
         }
-        this.stitches.push(new Stitch(pattern[i][q], index, i, q))
+        this.stitches.push(new Stitch(pattern[i][q], index, i, q, this.color))
         index++
       }
       row += 1
@@ -89,13 +99,11 @@ export class Work{
     }
   }
   setActiveStitch(){
-
+    if(this.finished)return;
     this.workingStitch = this.stitches[this.currentStitch]
     this.workingStitch.active = true;
-    console.log(this.workingStitch.col)
   }
   knitStitch(){
-    // if(this.atEndOfRow)return;
     let s = this.workingStitch;
     if(s.worked) return;
     if((s.type == 0 && !this.flipped)
@@ -105,7 +113,6 @@ export class Work{
     }
   }
   purlStitch(){
-    // if(this.atEndOfRow)return;
     let s = this.workingStitch;
     if(s.worked) return;
     if((s.type == 1 && !this.flipped)
@@ -122,8 +129,6 @@ export class Work{
       if(this.workingStitch.worked){
         this.currentStitch++
         this.setActiveStitch()
-      } else {
-        // this.finished = true;
       }
       if((this.currentStitch + 1) % this.stitchesPerRow == 0){
           this.atEndOfRow = true;
@@ -138,7 +143,6 @@ export class Work{
     this.advanceStitch();
   }
   uiHint(){
-    // console.log(this.workingStitch.type)
     if(this.finished) return;
     if(this.workingStitch.worked && !this.atEndOfRow){
       return "[shift] to start next stitch.";
@@ -153,5 +157,11 @@ export class Work{
       return "[down] to purl stitch";
     }
     return "Not sure what to do here";
+  }
+  setColor(color){
+    this.color = color;
+    for(let s of this.stitches){
+      s.color = color;
+    }
   }
 }
