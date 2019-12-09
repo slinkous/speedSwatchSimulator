@@ -1,22 +1,11 @@
 import {GAMESTATE} from "./game.js";
 import Yarn from "./yarn.js"
 
-let keyBuffer = [];
-let knit = ["up", "left", "right", "down"]
-let purl = ["down", "left", "right","up"]
-
 export default class InputHandler {
   constructor(game){
     this.inputStates = {};
-    // document.addEventListener("mousedown", event => {
-    //   this.inputStates.mouseDown = true;
-    //   game.start();
-    //   game.resetGame();
-    // });
-    // document.addEventListener("mouseup", event => {
-    //   this.inputStates.mouseDown = false;
-    // });
     document.addEventListener("keydown", event => {
+      event.preventDefault();
       switch(event.keyCode){
         case 37:
           this.inputStates["left"] = true;
