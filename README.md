@@ -1,5 +1,7 @@
 # Speed Swatch Simulator
 
+![screenshot](screenshot.png)
+
 ## Summary
 This game began as a submission to [TriJam #48](https://itch.io/jam/trijam-48) under the theme "Faster... Faster... F A S T E R". It has been developed considerably beyond the original three hours.
 
