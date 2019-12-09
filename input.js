@@ -1,4 +1,5 @@
 import {GAMESTATE} from "./game.js";
+import Yarn from "./yarn.js"
 
 let keyBuffer = [];
 let knit = ["up", "left", "right", "down"]
@@ -19,17 +20,21 @@ export default class InputHandler {
       switch(event.keyCode){
         case 37:
           this.inputStates["left"] = true;
+          if(game.gamestate == GAMESTATE.MENU){
+            Yarn.selectYarn("right")
+          }
           break;
         case 38:
           this.inputStates["up"] = true;
-
           if(game.gamestate == GAMESTATE.RUNNING){
             game.currentWork.knitStitch();
           }
-
           break;
         case 39:
           this.inputStates["right"] = true;
+          if(game.gamestate == GAMESTATE.MENU){
+            Yarn.selectYarn("right")
+          }
           break;
         case 40:
           this.inputStates["down"] = true;
@@ -47,13 +52,22 @@ export default class InputHandler {
           break;
         case 16:
           this.inputStates["shift"] = true;
-          game.currentWork.advanceStitch();
+          if(game.gamestate == GAMESTATE.MENU || game.gamestate == GAMESTATE.INSTRUCTIONS){
+            game.toggleInstructions();
+          }
+          if(game.gamestate == GAMESTATE.RUNNING){
+            game.currentWork.advanceStitch();
+          }
           break;
         case 13:
           this.inputStates["enter"] = true;
-          if(game.gamestate == GAMESTATE.MENU) game.start();
+          if(game.gamestate == GAMESTATE.MENU){
+            game.yarn = Yarn.chooseYarn();
+            game.currentWork.setColor(game.yarn.color)
+            game.start();
+          }
           if(game.gamestate == GAMESTATE.NEXTLEVEL) game.levelUp();
-          if(game.gamestate == GAMESTATE.GAMEOVER) game.reset();
+          if(game.gamestate == GAMESTATE.WIN) game.reset();
           if(game.gamestate == GAMESTATE.RUNNING) game.currentWork.turnWork();
           break;
 
